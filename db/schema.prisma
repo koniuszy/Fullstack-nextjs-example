@@ -13,13 +13,13 @@ generator client {
 model User {
   id    Int     @default(autoincrement()) @id
   email String  @unique
-  name  String?
+  name  String
   posts Post[]
 }
 
 model Post {
   id        Int     @default(autoincrement()) @id
-  text      String?
+  text      String
   title     String
   authorId  Int?
   author    User?   @relation(fields: [authorId], references: [id])
