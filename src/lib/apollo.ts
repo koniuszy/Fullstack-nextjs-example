@@ -12,7 +12,11 @@ function createApolloClient() {
     ssrMode: typeof window === 'undefined',
     link: new HttpLink({
       // will fail on build as long as you set the process.env.GRAPHQL_URI var to your hosted gql server
-      uri: process.env.GRAPHQL_URI || 'http://localhost:3000/api/graphql', // Server URL (must be absolute)
+      uri:
+        process.env.NODE_ENV === 'development'
+          ? 'http://localhost:3000/api/graphql'
+          : 'https://fullstack-nextjs-example.vercel.app/api/graphql',
+
       credentials: 'same-origin', // Additional fetch() options like `credentials` or `headers`
     }),
     cache: new InMemoryCache(),
