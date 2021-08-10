@@ -15,6 +15,7 @@ const schema = makeSchema({
     typegen: join(process.cwd(), 'generated/nexus-typegen.ts'),
     schema: join(process.cwd(), 'generated/schema.graphql'),
   },
+  prettierConfig: join(process.cwd(), '.prettierrc'),
   nonNullDefaults: { input: true, output: true },
 })
 

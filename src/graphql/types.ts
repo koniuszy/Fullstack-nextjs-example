@@ -1,10 +1,9 @@
-import { objectType, list } from 'nexus'
+import { objectType } from 'nexus'
 
 const User = objectType({
   name: 'User',
   definition(t) {
     t.int('id')
-    t.string('email')
     t.string('name')
     t.list.field('posts', {
       type: Post,

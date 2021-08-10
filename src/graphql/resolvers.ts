@@ -21,7 +21,7 @@ export const DeletePost = mutationField('deletePost', {
   },
 })
 
-export const GetPostList = queryField('posts', {
+export const GetPostList = queryField('postList', {
   type: list(Post),
   async resolve(_, args, ctx) {
     const postList = await ctx.db.post.findMany()

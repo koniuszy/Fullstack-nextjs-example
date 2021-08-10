@@ -20,7 +20,7 @@ const handler: NextApiHandler = async (req, res) => {
 
   await startServer
   await apolloServer.createHandler({
-    path: '/api',
+    path: '/api/graphql',
   })(req, res)
 }
 
