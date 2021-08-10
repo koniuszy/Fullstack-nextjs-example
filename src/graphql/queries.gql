@@ -27,3 +27,11 @@ mutation createPost($text: String!, $title: String!) {
     ...post
   }
 }
+
+mutation login {
+  login
+}
+
+mutation logout {
+  logout
+}

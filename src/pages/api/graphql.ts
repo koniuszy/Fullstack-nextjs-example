@@ -1,4 +1,5 @@
 import { NextApiHandler } from 'next'
+import { withIronSession } from 'next-iron-session'
 import { ApolloServer } from 'apollo-server-micro'
 
 import { createContext } from '../../graphql/context'
@@ -30,4 +31,13 @@ export const config = {
   },
 }
 
-export default handler
+const { SECRET_COOKIE_PASSWORD } = process.env
+if (!SECRET_COOKIE_PASSWORD) throw new Error('missing env: "SECRET_COOKIE_PASSWORD"')
+
+export default withIronSession(handler, {
+  cookieName: 'session',
+  password: SECRET_COOKIE_PASSWORD,
+  cookieOptions: {
+    secure: process.env.NODE_ENV === 'production',
+  },
+})

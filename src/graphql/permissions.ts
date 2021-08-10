@@ -9,6 +9,8 @@ const permissions = shield({
     '*': allow,
   },
   Mutation: {
+    login: allow,
+    logout: allow,
     createPost: allow,
     deletePost: isAdmin,
   },

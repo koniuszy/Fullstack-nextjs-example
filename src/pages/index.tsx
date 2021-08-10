@@ -15,7 +15,6 @@ import {
   Spacer,
   Input,
   Heading,
-  Center,
   Button,
 } from '@chakra-ui/react'
 import { DeleteIcon } from '@chakra-ui/icons'
@@ -29,6 +28,8 @@ import {
   PostListDocument,
   useDeletePostMutation,
   useCreatePostMutation,
+  useLoginMutation,
+  useLogoutMutation,
 } from '../../generated/graphql'
 import { addApolloState, initializeApollo } from '../lib/apollo'
 
@@ -51,6 +52,9 @@ const Home: FC = () => {
     refetchQueries: [PostListDocument],
   })
 
+  const [loginMutation] = useLoginMutation()
+  const [logoutMutation] = useLogoutMutation()
+
   return (
     <>
       <Head>
@@ -64,7 +68,16 @@ const Home: FC = () => {
           <FormLabel htmlFor="email-alerts" mb="0">
             Log in as an admin
           </FormLabel>
-          <Switch id="email-alerts" />
+          <Switch
+            onChange={(e) => {
+              if (e.target.checked) {
+                loginMutation()
+                return
+              }
+              logoutMutation()
+            }}
+            id="email-alerts"
+          />
         </FormControl>
 
         <Table w="full" size="lg" variant="simple">
@@ -152,6 +165,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
 
   return addApolloState(apolloClient, {
     props: {},
+    revalidate: 2,
   })
 }
 

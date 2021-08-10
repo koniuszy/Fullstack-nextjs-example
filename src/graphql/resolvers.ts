@@ -28,3 +28,26 @@ export const GetPostList = queryField('postList', {
     return postList
   },
 })
+
+export const LoginMutation = mutationField('login', {
+  type: 'String',
+  async resolve(root, args, ctx) {
+    // admin user
+    const user = ctx.db.user.findUnique({ where: { id: 1 } })
+
+    ctx.req.session.set('user', user)
+    await ctx.req.session.save()
+
+    return 'loggedIn'
+  },
+})
+
+export const LogoutMutation = mutationField('logout', {
+  type: 'String',
+  async resolve(root, args, ctx) {
+    ctx.req.session.destroy()
+    await ctx.req.session.save()
+
+    return 'loggedOut'
+  },
+})
