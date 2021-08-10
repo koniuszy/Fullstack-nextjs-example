@@ -1,8 +1,8 @@
 import { rule, shield, allow } from 'graphql-shield'
 
-const isAdmin = rule({ cache: 'contextual' })(async (parent, args, ctx, info) => {
-  return ctx.user.role === 'admin'
-})
+const isAdmin = rule({ cache: 'contextual' })(
+  async (parent, args, ctx, info) => ctx.user?.role === 'admin'
+)
 
 const permissions = shield({
   Query: {

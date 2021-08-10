@@ -9,7 +9,7 @@ type NextApiRequestWithSession = NextApiRequest & { session: Session }
 export interface Context {
   db: PrismaClient
   req: NextApiRequestWithSession
-  user: { id: number; role: 'admin' | 'editor' | 'user' }
+  user: { id: number; role: 'admin' | 'editor' | 'user' } | null | undefined
 }
 
 export async function createContext({
@@ -19,7 +19,6 @@ export async function createContext({
   res: NextApiResponse
 }): Promise<Context> {
   const user = req.session.get('user')
-
   return {
     db: prisma,
     req,

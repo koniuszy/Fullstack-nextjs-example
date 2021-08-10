@@ -6,7 +6,7 @@ export const CreatePost = mutationField('createPost', {
   args: { text: stringArg(), title: stringArg() },
   async resolve(_, { title, text }, ctx) {
     const createdPost = await ctx.db.post.create({
-      data: { title, author: { connect: { id: ctx.user.id } }, text },
+      data: { title, author: { connect: { id: ctx.user?.id || 2 } }, text },
     })
     return createdPost
   },
@@ -33,7 +33,7 @@ export const LoginMutation = mutationField('login', {
   type: 'String',
   async resolve(root, args, ctx) {
     // admin user
-    const user = ctx.db.user.findUnique({ where: { id: 1 } })
+    const user = await ctx.db.user.findUnique({ where: { id: 1 } })
 
     ctx.req.session.set('user', user)
     await ctx.req.session.save()

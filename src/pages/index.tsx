@@ -22,6 +22,7 @@ import { GetStaticProps } from 'next'
 import Head from 'next/head'
 import { FC, useState } from 'react'
 import { Textarea } from '@chakra-ui/react'
+import { useToast } from '@chakra-ui/react'
 
 import {
   usePostListQuery,
@@ -44,10 +45,20 @@ const TableTitles: FC = () => (
 )
 
 const Home: FC = () => {
+  const toast = useToast()
   const [form, setForm] = useState({ title: '', text: '' })
 
   const { data: posts } = usePostListQuery()
-  const [deletePostMutation] = useDeletePostMutation({ refetchQueries: [PostListDocument] })
+  const [deletePostMutation] = useDeletePostMutation({
+    refetchQueries: [PostListDocument],
+    onError() {
+      toast({
+        title: 'Log in as an admin first',
+        description: 'Not authorized',
+        status: 'error',
+      })
+    },
+  })
   const [createPostMutation, { loading: isCreatingPost }] = useCreatePostMutation({
     refetchQueries: [PostListDocument],
   })
