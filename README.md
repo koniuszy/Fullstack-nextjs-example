@@ -38,61 +38,57 @@ Start with
 yarn create next-app --typescript
 ```
 
-Since we have our fullstack app ready we can start setting the graphql server. We have many options here but we will follow the official <a href="https://github.com/vercel/next.js/blob/canary/examples/api-routes-graphql/pages/api/graphql.js">example</a>. Keep in mind that the tool we will use isn't <a href="https://github.com/apollographql/apollo-server/issues/5547#issuecomment-891408105">integrated intentionally</a> with Nextjs and we will have to do some workarounds to get fully working serverless handler that won't call the apollo server each time is triggered but only on cold-start.
+Since we have our fullstack app ready we can start setting the graphql server. From many available options/examples we will follow the <a href="https://github.com/vercel/next.js/blob/canary/examples/api-routes-graphql/pages/api/graphql.js">official one</a>. Keep in mind that the tool we will use isn't <a href="https://github.com/apollographql/apollo-server/issues/5547#issuecomment-891408105">integrated intentionally</a> with Nextjs and we will have to do some workarounds to get fully working serverless handler that won't call the apollo server each time is triggered but only on cold-starts.
 
 ```ts
-import { ApolloServer } from "apollo-server-micro";
-import { NextApiHandler } from "next";
+import { ApolloServer } from 'apollo-server-micro'
+import { NextApiHandler } from 'next'
 
-const apolloServer = new ApolloServer({ schema, context });
+const apolloServer = new ApolloServer({ schema, context })
 
-const startServer = apolloServer.start();
+const startServer = apolloServer.start()
 
 const handler: NextApiHandler = async (req, res) => {
-  res.setHeader("Access-Control-Allow-Credentials", "true");
-  res.setHeader(
-    "Access-Control-Allow-Origin",
-    "https://studio.apollographql.com"
-  );
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
-  );
-  if (req.method === "OPTIONS") {
-    res.end();
-    return;
+  res.setHeader('Access-Control-Allow-Credentials', 'true')
+  res.setHeader('Access-Control-Allow-Origin', 'https://studio.apollographql.com')
+  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
+  if (req.method === 'OPTIONS') {
+    res.end()
+    return
   }
 
-  await startServer;
+  await startServer
   await apolloServer.createHandler({
-    path: "/api",
-  })(req, res);
-};
+    path: '/api',
+  })(req, res)
+}
 
-export default handler;
+export default handler
 
 export const config = {
   api: {
     bodyParser: false,
   },
-};
+}
 ```
 
 The only 2 ts errors you should get so far are missing schema and context. Let's define them now.
 
-- context will be kind of our middleware called before each resolver. We will use it to determine either user is authorized or not and pass the global prisma instance to prevent connection creation for each db request.
+- context will be kind of our middleware called before each resolver. We will use it to determine either user is authorized or not and pass the global prisma instance to prevent connection creation for each db request. the `session` attribute comes from the <a href="https://github.com/vvo/next-iron-session">next-iron-session</a> library.
 
 ```ts
-export async function createContext(args: {
-  req: NextApiRequest;
-  res: NextApiResponse;
+export async function createContext({
+  req,
+}: {
+  req: NextApiRequestWithSession
+  res: NextApiResponse
 }): Promise<Context> {
-  const user = { id: 2, role: "admin" as const };
-
+  const user = req.session.get('user')
   return {
     db: prisma,
+    req,
     user,
-  };
+  }
 }
 ```
 
@@ -103,16 +99,68 @@ export async function createContext(args: {
 
 ```ts
 const schema = makeSchema({
-  types: [resolvers, types],
+  types: [resolvers],
   contextType: {
-    module: join(process.cwd(), "graphql", "context.ts"),
-    export: "Context",
+    module: join(process.cwd(), 'graphql', 'context.ts'),
+    export: 'Context',
   },
   outputs: {
-    typegen: join(process.cwd(), "generated/nexus-typegen.ts"),
-    schema: join(process.cwd(), "generated/schema.graphql"),
+    typegen: join(process.cwd(), 'generated/nexus-typegen.ts'),
+    schema: join(process.cwd(), 'generated/schema.graphql'),
   },
-});
+})
 ```
 
-We should still have 2 typescript errors which are not defined `resolvers` and `types`
+Let's provide a minimum to finally start the project
+
+- resolver which returns all posts from the database
+
+```ts
+export const GetPostList = queryField('postList', {
+  type: list(Post),
+  async resolve(_, args, ctx) {
+    const postList = await ctx.db.post.findMany()
+    return postList
+  },
+})
+```
+
+- `Post` type which was used in the example above
+
+```ts
+export const Post = objectType({
+  name: 'Post',
+  definition(t) {
+    t.int('id')
+    t.string('title')
+    t.string('text')
+  },
+})
+```
+
+The backend part is ready, now we need to say what we need on client side to generate optimized hooks. Write your gql queries down as following:
+
+```graphql
+query postList {
+  postList {
+    id
+    title
+    text
+  }
+}
+```
+
+Our code-base describes what we want to achieve. The rest may be auto generated. Following the scripts from `package.json`:
+
+```json
+{
+  "gen": "yarn gen:prisma && yarn gen:nexus && yarn gen:gql",
+  "gen:prisma": "yarn prisma generate",
+  "gen:nexus": "ts-node --transpile-only -P nexus.tsconfig.json src/graphql/schema",
+  "gen:gql": "graphql-codegen --config codegen.yml"
+}
+```
+
+1. generate types based on db.schema
+2. generate gql.schema
+3. generate hooks based on gql.schema
