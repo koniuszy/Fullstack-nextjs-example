@@ -1,6 +1,7 @@
 import { NextApiHandler } from 'next'
 import { withIronSession } from 'next-iron-session'
 import { ApolloServer } from 'apollo-server-micro'
+import cors from 'micro-cors'
 
 import { createContext } from '../../graphql/context'
 import schema from '../../graphql/schema'
@@ -10,10 +11,6 @@ const apolloServer = new ApolloServer({ schema, context: createContext })
 const startServer = apolloServer.start()
 
 const handler: NextApiHandler = async (req, res) => {
-  res.setHeader('Access-Control-Allow-Credentials', 'true')
-  res.setHeader('Access-Control-Allow-Origin', 'https://fullstack-nextjs-example.vercel.app')
-  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
-
   if (req.method === 'OPTIONS') {
     res.end()
     return
@@ -34,10 +31,12 @@ export const config = {
 const { SECRET_COOKIE_PASSWORD } = process.env
 if (!SECRET_COOKIE_PASSWORD) throw new Error('missing env: "SECRET_COOKIE_PASSWORD"')
 
-export default withIronSession(handler, {
-  cookieName: 'session',
-  password: SECRET_COOKIE_PASSWORD,
-  cookieOptions: {
-    secure: process.env.NODE_ENV === 'production',
-  },
-})
+export default cors()(
+  withIronSession(handler, {
+    cookieName: 'session',
+    password: SECRET_COOKIE_PASSWORD,
+    cookieOptions: {
+      secure: process.env.NODE_ENV === 'production',
+    },
+  })
+)
