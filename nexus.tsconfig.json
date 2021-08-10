@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "sourceMap": true,
+    "baseUrl": ".",
+    "rootDir": ".",
+    "outDir": "dist",
+    "strict": true,
+    "lib": ["esnext"],
+    "esModuleInterop": true,
+    "typeRoots": ["node_modules/@types", "types", "src/types"]
+  },
+  "ts-node": {
+    "compilerOptions": {
+      "strict": false,
+      "noImplicitAny": false
+    }
+  }
+}

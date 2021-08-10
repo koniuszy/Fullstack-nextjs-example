@@ -4,19 +4,40 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "build": "yarn db:push && yarn gen && next build",
+    "db:push": "yarn prisma db push",
+    "gen": "yarn gen:prisma && yarn gen:nexus && yarn gen:gql",
+    "gen:prisma": "yarn prisma generate",
+    "gen:nexus": "ts-node --transpile-only -P nexus.tsconfig.json src/graphql/schema",
+    "gen:gql": "graphql-codegen --config codegen.yml"
   },
   "dependencies": {
+    "@prisma/client": "^2.28.0",
+    "apollo-server-micro": "^3.1.2",
+    "graphql": "^15.5.1",
+    "graphql-middleware": "^6.0.10",
+    "graphql-shield": "^7.5.0",
+    "micro": "^9.3.4",
     "next": "11.0.1",
+    "nexus": "^1.1.0",
     "react": "17.0.2",
     "react-dom": "17.0.2"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "1.21.7",
+    "@graphql-codegen/typescript": "1.23.0",
+    "@graphql-codegen/typescript-operations": "1.18.4",
+    "@graphql-codegen/typescript-react-apollo": "2.3.1",
     "@types/react": "17.0.16",
     "eslint": "7.32.0",
     "eslint-config-next": "11.0.1",
+    "prisma": "^2.28.0",
+    "ts-node": "^10.2.0",
     "typescript": "4.3.5"
+  },
+  "prisma": {
+    "schema": "db/schema.prisma"
   }
 }
