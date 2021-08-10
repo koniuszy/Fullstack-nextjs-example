@@ -46,8 +46,6 @@ export const LogoutMutation = mutationField('logout', {
   type: 'String',
   async resolve(root, args, ctx) {
     ctx.req.session.destroy()
-    await ctx.req.session.save()
-
     return 'loggedOut'
   },
 })

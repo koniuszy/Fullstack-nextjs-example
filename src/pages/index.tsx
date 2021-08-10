@@ -168,7 +168,6 @@ const Home: FC = () => {
 }
 
 export const getStaticProps: GetStaticProps = async (context) => {
-  return { props: {} }
   const apolloClient = initializeApollo()
 
   await apolloClient.query({

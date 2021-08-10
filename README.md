@@ -164,3 +164,11 @@ Our code-base describes what we want to achieve. The rest may be auto generated.
 1. generate types based on db.schema
 2. generate gql.schema
 3. generate hooks based on gql.schema
+
+## Extra features
+
+1. `Gql shield` allows you to build logic around permissions. Point queries/mutations that you allow to be accessible for every users or only for admins.
+2. `Next-iron-session` takes care of encryption/decryption cookies for you. Keeping an object with an id in cookies allows us to fetch entire user and confirm his role. We create such a cookie on login action and remove it on logout
+3. `Vercel` will help you to host your application, build all your routes, set all handlers as AWS Lambda provide global cdn and caching support, create review-apps for each PR/branch.
+4. `Nexus-prisma` - upcoming plugin will generate even more code for you
+5. `Hydration` - fetch data on server side and send them to client with your first request. Using them as default value will replace all your loaders/placeholders in application. well... unless you need to await authorization.
