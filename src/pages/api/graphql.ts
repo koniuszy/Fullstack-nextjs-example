@@ -11,11 +11,6 @@ const startServer = apolloServer.start()
 
 const handler: NextApiHandler = async (req, res) => {
   res.setHeader('Access-Control-Allow-Credentials', 'true')
-  res.setHeader(
-    'Access-Control-Allow-Origin',
-    'https://studio.apollographql.com, https://fullstack-nextjs-example.vercel.app, http://localhost:3000'
-  )
-  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
 
   if (req.method === 'OPTIONS') {
     res.end()
