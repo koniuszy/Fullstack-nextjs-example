@@ -17,6 +17,7 @@ const schema = makeSchema({
   },
   prettierConfig: join(process.cwd(), '.prettierrc'),
   nonNullDefaults: { input: true, output: true },
+  shouldGenerateArtifacts: true,
 })
 
 export default applyMiddleware(schema, permissions)
