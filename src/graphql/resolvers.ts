@@ -3,10 +3,10 @@ import { Post } from './types'
 
 export const CreatePost = mutationField('createPost', {
   type: Post,
-  args: { text: stringArg(), title: stringArg(), authorId: intArg() },
-  async resolve(_, { title, authorId, text }, ctx) {
+  args: { text: stringArg(), title: stringArg() },
+  async resolve(_, { title, text }, ctx) {
     const createdPost = await ctx.db.post.create({
-      data: { title, author: { connect: { id: authorId } }, text },
+      data: { title, author: { connect: { id: ctx.user.id } }, text },
     })
     return createdPost
   },

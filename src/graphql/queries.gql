@@ -22,8 +22,8 @@ mutation deletePost($id: Int!) {
   deletePost(id: $id)
 }
 
-mutation createPost($text: String!, $title: String!, $authorId: Int!) {
-  createPost(text: $text, title: $title, authorId: $authorId) {
+mutation createPost($text: String!, $title: String!) {
+  createPost(text: $text, title: $title) {
     ...post
   }
 }

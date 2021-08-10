@@ -12,13 +12,24 @@ import {
   Thead,
   Tr,
   IconButton,
+  Spacer,
+  Input,
+  Heading,
+  Center,
+  Button,
 } from '@chakra-ui/react'
 import { DeleteIcon } from '@chakra-ui/icons'
 import { GetStaticProps } from 'next'
 import Head from 'next/head'
-import { FC } from 'react'
+import { FC, useState } from 'react'
+import { Textarea } from '@chakra-ui/react'
 
-import { usePostListQuery, PostListDocument, useDeletePostMutation } from '../../generated/graphql'
+import {
+  usePostListQuery,
+  PostListDocument,
+  useDeletePostMutation,
+  useCreatePostMutation,
+} from '../../generated/graphql'
 import { addApolloState, initializeApollo } from '../lib/apollo'
 
 const TableTitles: FC = () => (
@@ -32,8 +43,13 @@ const TableTitles: FC = () => (
 )
 
 const Home: FC = () => {
+  const [form, setForm] = useState({ title: '', text: '' })
+
   const { data: posts } = usePostListQuery()
-  const [deletePostMutation] = useDeletePostMutation()
+  const [deletePostMutation] = useDeletePostMutation({ refetchQueries: [PostListDocument] })
+  const [createPostMutation, { loading: isCreatingPost }] = useCreatePostMutation({
+    refetchQueries: [PostListDocument],
+  })
 
   return (
     <>
@@ -43,7 +59,7 @@ const Home: FC = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Container marginTop="10">
+      <Container w="5xl" maxW="none" marginY="10">
         <FormControl display="flex" alignItems="center">
           <FormLabel htmlFor="email-alerts" mb="0">
             Log in as an admin
@@ -51,7 +67,7 @@ const Home: FC = () => {
           <Switch id="email-alerts" />
         </FormControl>
 
-        <Table size="lg" variant="simple">
+        <Table w="full" size="lg" variant="simple">
           <TableCaption>Posts</TableCaption>
           <Thead>
             <Tr>
@@ -67,7 +83,7 @@ const Home: FC = () => {
                 <Td>{post.author?.name}</Td>
                 <Td>
                   <IconButton
-                    onClick={() => deletePostMutation({})}
+                    onClick={() => deletePostMutation({ variables: { id: post.id } })}
                     variant="outline"
                     colorScheme="red"
                     aria-label="Send email"
@@ -83,6 +99,45 @@ const Home: FC = () => {
             </Tr>
           </Tfoot>
         </Table>
+
+        <Spacer />
+
+        <Heading as="h4" size="md" mb="4">
+          Create a post
+        </Heading>
+
+        <form>
+          <FormControl mb="4" isRequired>
+            <FormLabel>Title</FormLabel>
+            <Input
+              value={form.title}
+              onChange={(e) => setForm({ ...form, title: e.target.value })}
+              placeholder="Title"
+            />
+          </FormControl>
+
+          <Textarea
+            value={form.text}
+            onChange={(e) => setForm({ ...form, text: e.target.value })}
+            placeholder="Here is a sample placeholder"
+            size="sm"
+          />
+
+          <Button
+            mt={4}
+            onClick={() =>
+              createPostMutation({ variables: { title: form.title, text: form.text } })
+            }
+            isLoading={isCreatingPost}
+            loadingText="Creating"
+            colorScheme="teal"
+            variant="outline"
+            type="submit"
+            spinnerPlacement="end"
+          >
+            Submit
+          </Button>
+        </form>
       </Container>
     </>
   )
