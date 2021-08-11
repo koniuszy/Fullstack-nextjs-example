@@ -1,6 +1,6 @@
 <div align="center">
-<h1>Static code analysis on the highest level</h1>
-<p>Sum up of how I started fullstack apps knowing only frontend basics</p>
+<h1>A first class static code analysis</h1>
+<p>A short story of how I started coding fullstack apps knowing only the basics of front-end</p>
 <p>
 	<a href="https://vercel.com/">Vercel</a>&nbsp;&nbsp;&nbsp;&nbsp;
 	<a href="https://www.apollographql.com/docs/">Apollo</a>&nbsp;&nbsp;&nbsp;&nbsp;
